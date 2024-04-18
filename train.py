@@ -14,10 +14,12 @@ lr = 1e-4
 device = "mps" if torch.backends.mps.is_available() else "cpu"
 
 train_dataset = DNADataset("data/fullset_train.csv")
-test_dataset = DNADataset("data/fullset_test.csv")
 validation_dataset = DNADataset("data/fullset_validation.csv")
+test_dataset = DNADataset("data/fullset_test.csv")
 
 train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+val_loader = DataLoader(validation_dataset, batch_size=batch_size, shuffle=True)
+test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=True)
 
 
 model = ViraMinerNet()
@@ -41,3 +43,25 @@ for epoch in range(num_epochs):
 
         loop.set_description(f"Epoch:[{epoch}/{num_epochs}](Train)")
         loop.set_postfix(train_loss=loss.item())
+    train_loss = run_loss/(idx + 1)
+
+    val_run_loss = 0
+    model.eval()
+    loop = tqdm(enumerate(train_loader), total=len(train_loader), leave=False)
+    with torch.no_grad():
+        for idx, (x,y) in loop:
+            x, y = x.to(device), y.to(device)
+            preds = model(x)
+            loss = loss_fn(preds, y)
+            val_run_loss += loss
+
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+
+            loop.set_description(f"Epoch:[{epoch}/{num_epochs}](Train)")
+            loop.set_postfix(train_loss=loss.item())
+            
+
+# TODO: Create Weighted Sampler (increase the weight of 1's in the dataset) 
+# TODO: ADD Precision, Recall, AUCROC score
