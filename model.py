@@ -1,5 +1,6 @@
 import torch
 from torch import nn
+from torch.nn import functional as F
 
 
 class FreqBranch(nn.Module):
@@ -49,4 +50,28 @@ class ViraMinerNet(nn.Module):
         x = torch.cat((x1, x2), dim=1)  # dim=1 because 0 is batch idx
         x = torch.flatten(x, 1)
         x = self.fc(x)
-        return x
+        return F.sigmoid(x)
+
+
+class FreqNet(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.fc = nn.Linear(1000, 1)
+        self.freqbranch = FreqBranch()
+
+    def forward(self, x):
+        x = self.freqbranch(x)
+        x = torch.flatten(x, 1)
+        return F.sigmoid(x)
+
+
+class PatNet(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.fc = nn.Linear(1200, 1)
+        self.patbranch = PatternBranch()
+
+    def forward(self, x):
+        x = self.patbranch(x)
+        x = torch.flatten(x, 1)
+        return F.sigmoid(x)

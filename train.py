@@ -13,6 +13,8 @@ lr = 1e-4
 
 device = "mps" if torch.backends.mps.is_available() else "cpu"
 
+torch.manual_seed(0)
+
 train_dataset = DNADataset("data/fullset_train.csv")
 validation_dataset = DNADataset("data/fullset_validation.csv")
 test_dataset = DNADataset("data/fullset_test.csv")
@@ -24,18 +26,18 @@ test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=True)
 
 model = ViraMinerNet()
 model.to(device)
-loss_fn = nn.BCEWithLogitsLoss()
+loss_fn = nn.BCELoss()
 optimizer = torch.optim.Adam(params=model.parameters(), lr=lr)
 
 for epoch in range(num_epochs):
-    run_loss = 0
+    train_run_loss = 0
     model.train()
     loop = tqdm(enumerate(train_loader), total=len(train_loader), leave=False)
     for idx, (x, y) in loop:
         x, y = x.to(device), y.to(device)
         preds = model(x)
         loss = loss_fn(preds, y)
-        run_loss += loss
+        train_run_loss += loss
 
         optimizer.zero_grad()
         loss.backward()
@@ -43,8 +45,10 @@ for epoch in range(num_epochs):
 
         loop.set_description(f"Epoch:[{epoch}/{num_epochs}](Train)")
         loop.set_postfix(train_loss=loss.item())
-    train_loss = run_loss/(idx + 1)
+    train_loss = train_run_loss/(idx + 1)
 
+
+    # Validation
     val_run_loss = 0
     model.eval()
     loop = tqdm(enumerate(train_loader), total=len(train_loader), leave=False)
@@ -63,5 +67,5 @@ for epoch in range(num_epochs):
             loop.set_postfix(train_loss=loss.item())
             
 
-# TODO: Create Weighted Sampler (increase the weight of 1's in the dataset) 
-# TODO: ADD Precision, Recall, AUCROC score
+# TODO: Create Weighted Sampler (increase the weight of 1's in the dataset)  
+# TODO: ADD Precision, Recall, AUCROC score for validation set
