@@ -6,14 +6,14 @@ from torch.utils.data import Dataset
 class DNADataset(Dataset):
     def __init__(self, csv_dir):
         self.dataset = pd.read_csv(csv_dir, header=None)
-        self.dataset.drop(0, axis=1)
+        self.dataset = self.dataset.drop(0, axis=1)
 
     def __len__(self):
         return len(self.dataset)
 
     def __getitem__(self, idx):
         data = self.dataset.iloc[idx]
-        code, label = data[0], data[1]
+        code, label = data[1], data[2]
         code = self.encode(code)
         label = torch.Tensor([label])
         return code, label
