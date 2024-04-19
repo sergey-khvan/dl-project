@@ -4,6 +4,7 @@ from torch.utils.data import DataLoader, WeightedRandomSampler
 from tqdm import tqdm
 import yaml
 from addict import Dict
+from sklearn.metrics import roc_auc_score
 
 from dataset import DNADataset
 from model import ViraMinerNet
@@ -70,7 +71,7 @@ def main():
             loop.set_description(f"Epoch:[{epoch}/{cfg.num_epochs}](Train)")
             loop.set_postfix(train_loss=loss.item())
         train_loss = train_run_loss / (idx + 1)
-
+        print("Train loss: ", train_loss)
         # Validation
         val_run_loss = 0
         model.eval()
@@ -91,7 +92,10 @@ def main():
                 loop.set_postfix(val_loss=loss.item())
                 
         val_loss = val_run_loss / (idx + 1)
-        
+        val_roc_score = roc_auc_score(all_labels, all_predictions)
+        print("Val loss: ", val_loss)
+        print("ROC score: ",val_roc_score)
+
         if epoch % 20 == 0:
             torch.save(
                 {
@@ -100,8 +104,6 @@ def main():
                 },
                 cfg.checkpoint_dir,
             )
-
-    # TODO: ADD Precision, Recall, AUCROC score for validation set
 
 
 if __name__ == "__main__":
