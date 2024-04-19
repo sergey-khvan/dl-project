@@ -1,0 +1,9 @@
+train_dir: ../data/fullset_train.csv
+test_dir: ../data/fullset_test.csv
+val_dir: ../data/fullset_validation.csv
+checkpoint_dir: ../checkpoints/checkpoint.pt
+
+load_from_checkpoint: False
+num_epochs: 10
+batch_size: 16
+lr: 1e-4
