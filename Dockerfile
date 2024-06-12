@@ -11,3 +11,4 @@ RUN pip install --upgrade pip
 RUN pip install addict
 RUN pip install wandb
 RUN pip install scikit-learn
+RUN pip install pandas

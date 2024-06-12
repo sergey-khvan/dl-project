@@ -88,12 +88,16 @@ def main():
             for idx, (x, y) in loop:
                 x, y = x.to(device), y.to(device)
                 preds = model(x)
-                all_predictions.extend(preds.cpu().numpy())
-                all_labels.extend(y.cpu().numpy())
 
                 loss = loss_fn(preds, y)
                 val_run_loss += loss
-
+                
+                preds = preds.cpu()
+                preds[preds < 0.5] = 0.0
+                preds[preds >= 0.5] = 1.0
+                
+                all_predictions.extend(preds.numpy())
+                all_labels.extend(y.cpu().numpy())
                 loop.set_description(f"Epoch:[{epoch}/{cfg.num_epochs}](Val)")
                 loop.set_postfix(val_loss=loss.item())
 
