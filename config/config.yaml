@@ -4,6 +4,6 @@ val_dir: ../data/fullset_validation.csv
 checkpoint_dir: ../checkpoints/checkpoint.pt
 
 load_from_checkpoint: False
-num_epochs: 10
+num_epochs: 100
 batch_size: 16
 lr: 0.0001

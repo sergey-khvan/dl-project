@@ -3,13 +3,9 @@ import torch
 from torch.utils.data import Dataset
 
 class DNADataset(Dataset):
-    def __init__(self, csv_dir, transform=None):
+    def __init__(self, csv_dir):
         self.dataset = pd.read_csv(csv_dir, header=None)
         self.dataset = self.dataset.drop(0, axis=1)
-        # &&&&&&&&&&&&&&&&&&&&&&&&&&&
-        # THIS PART WAS MADE BY IEGOR
-        self.tranform = transform
-        # &&&&&&&&&&&&&&&&&&&&&&&&&&&
 
     def __len__(self):
         return len(self.dataset)
@@ -17,11 +13,6 @@ class DNADataset(Dataset):
     def __getitem__(self, idx):
         data = self.dataset.iloc[idx]
         code, label = data[1], data[2]
-        # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-        # THIS PART WAS MADE BY IEGOR
-        if self.transform:
-            code = self.transform(code)
-        # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         code = self.encode(code)
         label = torch.Tensor([label])
         return code, label

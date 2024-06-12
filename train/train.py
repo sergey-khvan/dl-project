@@ -1,11 +1,13 @@
 import torch
-from torch import nn
-from torch.utils.data import DataLoader, WeightedRandomSampler
-from tqdm import tqdm
+import wandb
 import yaml
 from addict import Dict
 from sklearn.metrics import roc_auc_score
+from torch import nn
+from torch.utils.data import DataLoader, WeightedRandomSampler
+from tqdm import tqdm
 
+from comparing_model import NewNet
 from dataset import DNADataset
 from model import ViraMinerNet
 
@@ -34,7 +36,9 @@ def main():
 
     torch.manual_seed(0)
     device = "mps" if torch.backends.mps.is_available() else "cpu"
-    
+    device = "cuda" if torch.cuda.is_available() else device
+
+    # region creation of DATASET, DATALOADERS
     train_dataset = DNADataset(cfg.train_dir)
     validation_dataset = DNADataset(cfg.val_dir)
     test_dataset = DNADataset(cfg.test_dir)
@@ -42,16 +46,20 @@ def main():
     train_loader = get_loader(train_dataset, batch_size=cfg.batch_size)
     val_loader = DataLoader(validation_dataset, batch_size=cfg.batch_size, shuffle=True)
     test_loader = DataLoader(test_dataset, batch_size=cfg.batch_size, shuffle=True)
+    # endregion
 
     model = ViraMinerNet()
     model.to(device)
     loss_fn = nn.BCELoss()
     optimizer = torch.optim.Adam(params=model.parameters(), lr=cfg.lr)
 
+    # Loading from model from checkpoint if available
     if cfg.load_from_checkpoint:
         checkpoint = torch.load(cfg.checkpoint_dir)
         model.load_state_dict(checkpoint["model_state_dict"])
         optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
+
+    # wandb.config("DL-project")
 
     for epoch in range(cfg.num_epochs):
         # Training
@@ -79,22 +87,22 @@ def main():
         all_labels = []
         loop = tqdm(enumerate(val_loader), total=len(val_loader), leave=False)
         with torch.no_grad():
-            for idx, (x,y) in loop:
+            for idx, (x, y) in loop:
                 x, y = x.to(device), y.to(device)
                 preds = model(x)
                 all_predictions.extend(preds.cpu().numpy())
                 all_labels.extend(y.cpu().numpy())
-                
+
                 loss = loss_fn(preds, y)
                 val_run_loss += loss
 
                 loop.set_description(f"Epoch:[{epoch}/{cfg.num_epochs}](Val)")
                 loop.set_postfix(val_loss=loss.item())
-                
+
         val_loss = val_run_loss / (idx + 1)
         val_roc_score = roc_auc_score(all_labels, all_predictions)
         print("Val loss: ", val_loss)
-        print("ROC score: ",val_roc_score)
+        print("ROC score: ", val_roc_score)
 
         if epoch % 20 == 0:
             torch.save(
