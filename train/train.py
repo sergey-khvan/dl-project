@@ -1,3 +1,4 @@
+import os
 import torch
 import wandb
 import yaml
@@ -29,6 +30,7 @@ def get_loader(dataset, batch_size):
 
 
 def main():
+    os.makedirs("../checkpoints", exist_ok=True)
     with open("../config/config.yaml", "r") as f:
         cfg = yaml.safe_load(f)
 
