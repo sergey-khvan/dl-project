@@ -1,35 +1,6 @@
 import pandas as pd
 import torch
 from torch.utils.data import Dataset
-# &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-# THIS PART WAS MADE BY IEGOR
-import random
-
-class RandomMutation:
-    def __init__(self, mutation_rate=0.01):
-        self.mutation_rate = mutation_rate
-    
-    def __call__(self, sequence):
-        mutated_sequence = list(sequence)
-        for i in range(len(sequence)):
-            if random.random() < self.mutation_rate:
-                mutated_sequence[i] = random.choice('ACGT')
-        return ''.join(mutated_sequence)
-
-class ReverseComplement:
-    def __call__(self, sequence):
-        complement = {'A': 'T', 'T': 'A', 'C': 'G', 'G': 'C'}
-        return ''.join(complement[base] for base in reversed(sequence))
-
-class SequenceShuffle:
-    def __init__(self, segment_size=10):
-        self.segment_size = segment_size
-    
-    def __call__(self, sequence):
-        segments = [sequence[i:i + self.segment_size] for i in range(0, len(sequence), self.segment_size)]
-        random.shuffle(segments)
-        return ''.join(segments)
-# &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
 class DNADataset(Dataset):
     def __init__(self, csv_dir, transform=None):

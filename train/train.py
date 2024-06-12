@@ -9,7 +9,6 @@ from sklearn.metrics import roc_auc_score
 from dataset import DNADataset
 from model import ViraMinerNet
 
-from torchvisions.transforms import Compose # ADDED BY IEGOR
 
 def get_loader(dataset, batch_size):
     class_weights = [1 / 30, 1]
@@ -35,17 +34,8 @@ def main():
 
     torch.manual_seed(0)
     device = "mps" if torch.backends.mps.is_available() else "cpu"
-
-    # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-    # PART MADE BY IEGOR
-    transform = Compose([
-        RandomMutation(mutation_rate=0.05),
-        ReverseComplement(),
-        SequenceShuffle(segment_size=5)
-    ])
-    # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
     
-    train_dataset = DNADataset(cfg.train_dir, transform) # ADDED "transform" by IEGOR
+    train_dataset = DNADataset(cfg.train_dir)
     validation_dataset = DNADataset(cfg.val_dir)
     test_dataset = DNADataset(cfg.test_dir)
 
