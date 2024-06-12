@@ -1,0 +1,45 @@
+{
+    "os": "macOS-14.4.1-x86_64-i386-64bit",
+    "python": "3.12.3",
+    "heartbeatAt": "2024-06-12T20:10:57.572166",
+    "startedAt": "2024-06-12T20:10:57.002820",
+    "docker": null,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "/Users/sergekhvan/projects/unipd/dl_project/train/train.py",
+    "codePathLocal": "train.py",
+    "codePath": "train/train.py",
+    "git": {
+        "remote": "https://github.com/sergey-khvan/dl-project.git",
+        "commit": "4f1a4421dd20fbf8317b3b91a4d7654af0fb18a3"
+    },
+    "email": "sergey.khvan.k01@gmail.com",
+    "root": "/Users/sergekhvan/projects/unipd/dl_project",
+    "host": "Sergejs-MBP.homenet.telecomitalia.it",
+    "username": "sergekhvan",
+    "executable": "/usr/local/opt/python@3.12/bin/python3.12",
+    "cpu_count": 10,
+    "cpu_count_logical": 10,
+    "cpu_freq": {
+        "current": 2400,
+        "min": 2400,
+        "max": 2400
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 2400,
+            "min": 2400,
+            "max": 2400
+        }
+    ],
+    "disk": {
+        "/": {
+            "total": 926.3517189025879,
+            "used": 9.53714370727539
+        }
+    },
+    "memory": {
+        "total": 16.0
+    }
+}

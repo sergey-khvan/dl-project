@@ -40,11 +40,9 @@ def main():
 
     # region creation of DATASET, DATALOADERS
     train_dataset = DNADataset(cfg.train_dir)
-    validation_dataset = DNADataset(cfg.val_dir)
     test_dataset = DNADataset(cfg.test_dir)
 
     train_loader = get_loader(train_dataset, batch_size=cfg.batch_size)
-    val_loader = DataLoader(validation_dataset, batch_size=cfg.batch_size, shuffle=True)
     test_loader = DataLoader(test_dataset, batch_size=cfg.batch_size, shuffle=True)
     # endregion
 
@@ -59,7 +57,7 @@ def main():
         model.load_state_dict(checkpoint["model_state_dict"])
         optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
 
-    # wandb.config("DL-project")
+    wandb.init(project="DL-project")
 
     for epoch in range(cfg.num_epochs):
         # Training
@@ -85,7 +83,7 @@ def main():
         model.eval()
         all_predictions = []
         all_labels = []
-        loop = tqdm(enumerate(val_loader), total=len(val_loader), leave=False)
+        loop = tqdm(enumerate(test_loader), total=len(test_loader), leave=False)
         with torch.no_grad():
             for idx, (x, y) in loop:
                 x, y = x.to(device), y.to(device)
@@ -103,7 +101,12 @@ def main():
         val_roc_score = roc_auc_score(all_labels, all_predictions)
         print("Val loss: ", val_loss)
         print("ROC score: ", val_roc_score)
-
+        
+        wandb.log({
+                "train_loss_VNet": train_loss,
+                "val_loss_VNet": val_loss,
+                "roc_auc_score_VNet": val_roc_score,
+            })
         if epoch % 20 == 0:
             torch.save(
                 {
@@ -112,6 +115,13 @@ def main():
                 },
                 cfg.checkpoint_dir,
             )
+    torch.save(
+            {
+                "model_state_dict": model.state_dict(),
+                "optimizer_state_dict": optimizer.state_dict(),
+            },
+            cfg.checkpoint_dir,
+        )
 
 
 if __name__ == "__main__":
