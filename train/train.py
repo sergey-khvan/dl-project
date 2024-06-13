@@ -14,7 +14,7 @@ from model import ViraMinerNet
 
 
 def get_loader(dataset, batch_size):
-    class_weights = [1 / 30, 1]
+    class_weights = [1 / 10, 1]
 
     sample_weights = [0] * len(dataset)
     for idx, (data, label) in enumerate(dataset):
@@ -42,10 +42,10 @@ def main():
 
     # region creation of DATASET, DATALOADERS
     train_dataset = DNADataset(cfg.train_dir)
-    test_dataset = DNADataset(cfg.test_dir)
+    val_dataset = DNADataset(cfg.val_dir)
 
     train_loader = get_loader(train_dataset, batch_size=cfg.batch_size)
-    test_loader = DataLoader(test_dataset, batch_size=cfg.batch_size, shuffle=True)
+    val_loader = DataLoader(val_dataset, batch_size=cfg.batch_size, shuffle=True)
     # endregion
 
     model = ViraMinerNet()
@@ -85,7 +85,7 @@ def main():
         model.eval()
         all_predictions = []
         all_labels = []
-        loop = tqdm(enumerate(test_loader), total=len(test_loader), leave=False)
+        loop = tqdm(enumerate(val_loader), total=len(val_loader), leave=False)
         with torch.no_grad():
             for idx, (x, y) in loop:
                 x, y = x.to(device), y.to(device)

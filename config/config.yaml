@@ -1,4 +1,5 @@
 train_dir: ../data/fullset_train.csv
+val_dir: ../data/fullset_validation.csv
 test_dir: ../data/fullset_test.csv
 checkpoint_dir: ../checkpoints/checkpoint.pt
 
